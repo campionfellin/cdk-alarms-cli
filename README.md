@@ -15,7 +15,8 @@ What it will do:
 Right now, it is not published on `npm` so you'll have to follow these steps:
 
 ```
-git clone && \
+git clone https://github.com/campionfellin/cdk-alarms-cli.git && \
+cd cdk-alarms-cli && \
 npm i && npm run build && npm i -g && \
 cdk-alarms-cli
 ```
