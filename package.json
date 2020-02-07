@@ -1,0 +1,38 @@
+{
+  "name": "cdk-alarms-cli",
+  "version": "0.1.0",
+  "main": "./src/index.js",
+  "bin": {
+    "cdk-alarms-cli": "./src/index.js"
+  },
+  "scripts": {
+    "build": "tsc -p .",
+    "watch": "tsc -w",
+    "test": "jest",
+    "cdk": "cdk",
+    "all": "npm run build && npm i -g"
+  },
+  "devDependencies": {
+    "@types/node": "^10.17.0",
+    "typescript": "~3.7.2"
+  },
+  "dependencies": {
+    "@aws-cdk/aws-cloudwatch": "^1.22.0",
+    "@aws-cdk/aws-dynamodb": "^1.22.0",
+    "@aws-cdk/aws-lambda": "^1.22.0",
+    "@aws-cdk/core": "^1.22.0",
+    "@types/inquirer": "^6.5.0",
+    "@types/jest": "^25.1.2",
+    "@types/node": "^13.7.0",
+    "aws-cdk": "^1.22.0",
+    "chalk": "^3.0.0",
+    "clear": "^0.1.0",
+    "codemaker": "^0.21.2",
+    "commander": "^4.1.0",
+    "figlet": "^1.2.4",
+    "inquirer": "^7.0.4",
+    "path": "^0.12.7",
+    "ts-node": "^8.6.2",
+    "typescript": "^3.7.5"
+  }
+}
