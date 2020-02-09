@@ -7,6 +7,7 @@ const inquirer = require('inquirer');
 import { Answers, Separator } from 'inquirer'
 const commander = require('commander');
 const program = new commander.Command();
+import { table } from 'table'
 import { App } from '@aws-cdk/core';
 import { DynamoAlarms } from './dynamo-alarms';
 import { execSync } from 'child_process';
@@ -108,6 +109,29 @@ inquirer.prompt(questions).then((answers: any) => {
     const alarmTypes: Answers = await collectAlarmTypes(baseTypes)
 
     console.log('Amazing! You must really like alarms.\n\n')
+
+    console.log('These are the alarms I\'ll be making:\n\n')
+
+    let tableAlarmTypes: any[] = Object.keys(baseTypes);
+    tableAlarmTypes.unshift('Resource Name')
+
+    let myData: any[][] = inputs.map((input: Answers) => {
+      let newArray = new Array(tableAlarmTypes.length)
+      newArray[0] = input.inputValue
+
+      for (let i = 1; i < newArray.length; i++) {
+        if (alarmTypes.alarms.includes(tableAlarmTypes[i])) {
+          newArray[i] = 'x'
+        } else {
+          newArray[i] = ' '
+        }
+      }
+      return newArray
+    })
+
+    myData.unshift(tableAlarmTypes)
+
+    console.log(table(myData))
     console.log('I\'m going to make a CFN template for you and open it up.\n\n')
       
     const app = new App({
@@ -131,7 +155,6 @@ inquirer.prompt(questions).then((answers: any) => {
     app.synth()
 
     setTimeout(() => {
-      clear();
       console.log(
         chalk.white(
           figlet.textSync('Goodbye', { horizontalLayout: 'full' })
