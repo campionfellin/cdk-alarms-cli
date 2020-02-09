@@ -8,8 +8,11 @@ import { Answers, Separator } from 'inquirer'
 const commander = require('commander');
 const program = new commander.Command();
 import { App } from '@aws-cdk/core';
-import { DynamoAlarms } from '../src/dynamo-alarms';
+import { DynamoAlarms } from './dynamo-alarms';
 import { execSync } from 'child_process';
+import { alarmTypeToConstruct as dynamoAlarmTypes } from './alarmTypes/dynamodb/AlarmTypeToConstruct'
+import { alarmTypeToConstruct as lambdaAlarmTypes } from './alarmTypes/lambda/AlarmTypeToConstruct'
+import { LambdaAlarms } from './lambda-alarms';
 
 clear();
 console.log(
@@ -54,7 +57,7 @@ const questions = [
   {
     type: 'confirm',
     name: 'lambdaconfirm',
-    message: 'Lambda is not supported yet.. sorry',
+    message: 'Just to confirm, we want Lambda alarms?',
     when: (answers: any) => {
       return answers.alarmType === 'Lambda'
     }
@@ -66,12 +69,12 @@ const collectInputs = async (inputs: Answers[] = []): Promise<Answers[]> => {
     {
       type: 'input',
       name: 'inputValue',
-      message: 'Enter your table name: '
+      message: 'Enter your resource name: '
     },
     {
       type: 'confirm',
       name: 'again',
-      message: 'Enter another table? ',
+      message: 'Enter another resource? ',
     }
   ];
 
@@ -81,44 +84,28 @@ const collectInputs = async (inputs: Answers[] = []): Promise<Answers[]> => {
   return again ? collectInputs(newInputs) : newInputs;
 };
 
-const collectAlarmTypes = (): Promise<Answers> => {
-  const choices = [
-    new Separator(' === The Alarm Options === '),
-    {
-      name: 'ReadThrottlingAlarm'
-    },
-    {
-      name: 'AccountRCUAlarm'
-    },
-    {
-      name: 'AccountWCUAlarm'
-    },
-    {
-      name: 'TableRCUAlarm'
-    },
-    {
-      name: 'TableWCUAlarm'
-    },
-    {
-      name: 'More to Come! (don\'t select)'
-    }
-  ]
+const collectAlarmTypes = (baseTypes: Record<string, any>): Promise<Answers> => {
+  let alarmTypes: any[] = Object.keys(baseTypes).map((key: string ) => ({ name: key }));
+
+  alarmTypes.unshift(new Separator(' === The Alarm Options === '))
+  alarmTypes.push({ name: 'More options to come...' })
 
   return inquirer.prompt([{
     type: 'checkbox',
-    message: 'Select Alarms (then hit enter)',
+    message: 'Select Alarms with space (then hit enter)',
     name: 'alarms',
-    choices: choices
+    choices: alarmTypes
   }])
 };
 
-inquirer.prompt(questions).then(() => {
+inquirer.prompt(questions).then((answers: any) => {
   console.log('Great! I\'ll be asking for some info now.\n')
 
   collectInputs().then(async (inputs: Answers[]) => {
     console.log(`\nWow! So many amazing tables you have. I count ${inputs.length} of them\n`)
 
-    const alarmTypes: Answers = await collectAlarmTypes()
+    const baseTypes = answers.alarmType === 'DynamoDB' ? dynamoAlarmTypes : lambdaAlarmTypes
+    const alarmTypes: Answers = await collectAlarmTypes(baseTypes)
 
     console.log('Amazing! You must really like alarms.\n\n')
     console.log('I\'m going to make a CFN template for you and open it up.\n\n')
@@ -126,12 +113,21 @@ inquirer.prompt(questions).then(() => {
     const app = new App({
         outdir: 'cdk.out'
     });
-    new DynamoAlarms(
-      app,
-      'DynamoAlarms',
-      inputs.map((input: Answers) => input.inputValue),
-      alarmTypes.alarms
-    );
+
+    answers.alarmType === 'DynamoDB' ? 
+      new DynamoAlarms(
+        app,
+        'DynamoDBAlarms',
+        inputs.map((input: Answers) => input.inputValue),
+        alarmTypes.alarms
+      ) :
+      new LambdaAlarms(
+        app,
+        'LambdaAlarms',
+        inputs.map((input: Answers) => input.inputValue),
+        alarmTypes.alarms
+      )
+
     app.synth()
 
     setTimeout(() => {
@@ -141,7 +137,7 @@ inquirer.prompt(questions).then(() => {
           figlet.textSync('Goodbye', { horizontalLayout: 'full' })
         )
       );
-      execSync(`code ./cdk.out/DynamoAlarms.template.json`)
+      execSync(`code ./cdk.out/${answers.alarmType}Alarms.template.json`)
     }, 2000)
   })
     
