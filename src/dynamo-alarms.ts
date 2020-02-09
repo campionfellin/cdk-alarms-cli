@@ -1,5 +1,5 @@
 import { App, Stack, StackProps } from '@aws-cdk/core';
-import { alarmTypeToConstructor } from './config/AlarmTypeToConstructor';
+import { alarmTypeToConstruct } from './alarmTypes/dynamodb/AlarmTypeToConstruct';
 
 export class DynamoAlarms extends Stack {
   constructor(scope: App, id: string, tables: string[], alarmTypes: string[], props?: StackProps) {
@@ -7,7 +7,7 @@ export class DynamoAlarms extends Stack {
 
     tables?.forEach((table: string) => {
       alarmTypes?.forEach((alarmType: string) => {
-        alarmTypeToConstructor[alarmType](this, table)
+        new alarmTypeToConstruct[alarmType](this, `${table}-${alarmType}`, { tableName: table })
       })
     })
   }

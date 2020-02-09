@@ -88,6 +88,18 @@ const collectAlarmTypes = (): Promise<Answers> => {
       name: 'ReadThrottlingAlarm'
     },
     {
+      name: 'AccountRCUAlarm'
+    },
+    {
+      name: 'AccountWCUAlarm'
+    },
+    {
+      name: 'TableRCUAlarm'
+    },
+    {
+      name: 'TableWCUAlarm'
+    },
+    {
       name: 'More to Come! (don\'t select)'
     }
   ]
