@@ -16,7 +16,7 @@ export interface TableRCUAlarmProps {
 export class TableRCUAlarm extends Construct {
   constructor(scope: Construct, id: string, props: TableRCUAlarmProps) {
     super(scope, id)
-    const AccountProvisionedRCU = new Metric({
+    const MaxProvisionedTableRCU = new Metric({
       namespace: 'AWS/DynamoDB',
       metricName: 'MaxProvisionedTableReadCapacityUtilization',
       dimensions: {
@@ -28,7 +28,7 @@ export class TableRCUAlarm extends Construct {
     })
     
     new Alarm(scope, `${props.tableName}TableRCUAlarm`, {
-      metric: AccountProvisionedRCU,
+      metric: MaxProvisionedTableRCU,
       evaluationPeriods: 1,
       threshold: 80.0,
       comparisonOperator: ComparisonOperator.GREATER_THAN_THRESHOLD

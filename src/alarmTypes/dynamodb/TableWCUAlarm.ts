@@ -16,7 +16,7 @@ export interface TableWCUAlarmProps {
 export class TableWCUAlarm extends Construct {
   constructor(scope: Construct, id: string, props: TableWCUAlarmProps) {
     super(scope, id)
-    const AccountProvisionedRCU = new Metric({
+    const MaxProvisionedTableWCU = new Metric({
       namespace: 'AWS/DynamoDB',
       metricName: 'MaxProvisionedTableWriteCapacityUtilization',
       dimensions: {
@@ -28,7 +28,7 @@ export class TableWCUAlarm extends Construct {
     })
     
     new Alarm(scope, `${props.tableName}TableWCUAlarm`, {
-      metric: AccountProvisionedRCU,
+      metric: MaxProvisionedTableWCU,
       evaluationPeriods: 1,
       threshold: 80.0,
       comparisonOperator: ComparisonOperator.GREATER_THAN_THRESHOLD
