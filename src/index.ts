@@ -27,7 +27,7 @@ program
   .description("CLI to help you write your CFN alarms")
   .parse(process.argv);
 
-console.log('Hey! Welcome to cdk-alarms-cli')
+console.log('\n\nHey! Welcome to cdk-alarms-cli\n')
 console.log('I\'ll be helping you create some basic common alarms\n')
 
 const questions = [
@@ -35,7 +35,6 @@ const questions = [
     type: 'input',
     name: 'userName',
     message: 'First of all, what\'s your name?',
-    default: 'Cool Name'
   },
   {
     type: 'list',
@@ -43,8 +42,7 @@ const questions = [
     message: 'Wow! What a cool name. \nWhat kind of alarms are we making today?',
     choices: [
       'DynamoDB',
-      'Lambda',
-      'Other (in the future)'
+      'Lambda'
     ]
   },
   {
@@ -89,7 +87,6 @@ const collectAlarmTypes = (baseTypes: Record<string, any>): Promise<Answers> => 
   let alarmTypes: any[] = Object.keys(baseTypes).map((key: string ) => ({ name: key }));
 
   alarmTypes.unshift(new Separator(' === The Alarm Options === '))
-  alarmTypes.push({ name: 'More options to come...' })
 
   return inquirer.prompt([{
     type: 'checkbox',
@@ -100,15 +97,20 @@ const collectAlarmTypes = (baseTypes: Record<string, any>): Promise<Answers> => 
 };
 
 inquirer.prompt(questions).then((answers: any) => {
+  if (answers.ddbconfirm === false || answers.lambdaconfirm === false) {
+    console.log('Ok, maybe next time!')
+    process.exit(0)
+  }
+
   console.log('Great! I\'ll be asking for some info now.\n')
 
   collectInputs().then(async (inputs: Answers[]) => {
-    console.log(`\nWow! So many amazing tables you have. I count ${inputs.length} of them\n`)
+    console.log(`\nWow! So many amazing resources you have. I count ${inputs.length} of them\n`)
 
     const baseTypes = answers.alarmType === 'DynamoDB' ? dynamoAlarmTypes : lambdaAlarmTypes
     const alarmTypes: Answers = await collectAlarmTypes(baseTypes)
 
-    console.log('Amazing! You must really like alarms.\n\n')
+    console.log('\n\nAmazing! You must really like alarms.\n\n')
 
     console.log('These are the alarms I\'ll be making:\n\n')
 
@@ -132,36 +134,49 @@ inquirer.prompt(questions).then((answers: any) => {
     myData.unshift(tableAlarmTypes)
 
     console.log(table(myData))
-    console.log('I\'m going to make a CFN template for you and open it up.\n\n')
+
+    inquirer.prompt({
+      type: 'confirm',
+      name: 'finalCnfirm',
+      message: 'Does this look good to you?',
+    }).then(() => {
+      console.log('I\'m going to make a CFN template for you and open it up.\n\n')
       
-    const app = new App({
-        outdir: 'cdk.out'
-    });
-
-    answers.alarmType === 'DynamoDB' ? 
-      new DynamoAlarms(
-        app,
-        'DynamoDBAlarms',
-        inputs.map((input: Answers) => input.inputValue),
-        alarmTypes.alarms
-      ) :
-      new LambdaAlarms(
-        app,
-        'LambdaAlarms',
-        inputs.map((input: Answers) => input.inputValue),
-        alarmTypes.alarms
-      )
-
-    app.synth()
-
-    setTimeout(() => {
-      console.log(
-        chalk.white(
-          figlet.textSync('Goodbye', { horizontalLayout: 'full' })
+      const app = new App({
+          outdir: 'cdk.out'
+      });
+  
+      answers.alarmType === 'DynamoDB' ? 
+        new DynamoAlarms(
+          app,
+          'DynamoDBAlarms',
+          inputs.map((input: Answers) => input.inputValue),
+          alarmTypes.alarms
+        ) :
+        new LambdaAlarms(
+          app,
+          'LambdaAlarms',
+          inputs.map((input: Answers) => input.inputValue),
+          alarmTypes.alarms
         )
-      );
-      execSync(`code ./cdk.out/${answers.alarmType}Alarms.template.json`)
-    }, 2000)
+  
+      app.synth()
+  
+      setTimeout(() => {
+        console.log(
+          chalk.white(
+            figlet.textSync('Goodbye', { horizontalLayout: 'full' })
+          )
+        );
+        try {
+          execSync(`code ./cdk.out/${answers.alarmType}Alarms.template.json`)
+        } catch {
+          console.log('Could not open your file. Please open ./cdk.out/${answers.alarmType}Alarms.template.json\nto find your alarms.')
+        }
+      }, 1000)
+    })
+
+    
   })
     
 });
