@@ -9,14 +9,14 @@ import {
   ComparisonOperator
 } from '@aws-cdk/aws-cloudwatch'
 
-export interface ErrorCountAlarmProps {
+export interface HighAverageErrorCountAlarmProps {
   lambdaName: string;
 }
 
-export class ErrorCountAlarm extends Construct {
-  constructor(scope: Construct, id: string, props: ErrorCountAlarmProps) {
+export class HighAverageErrorCountAlarm extends Construct {
+  constructor(scope: Construct, id: string, props: HighAverageErrorCountAlarmProps) {
     super(scope, id)
-    const LowRequestCount = new Metric({
+    const HighAverageErrorCount = new Metric({
       namespace: 'AWS/Lambda',
       metricName: 'Errors',
       dimensions: {
@@ -27,8 +27,8 @@ export class ErrorCountAlarm extends Construct {
       unit: Unit.COUNT
     })
     
-    new Alarm(scope, `${props.lambdaName}HighErrorCount`, {
-      metric: LowRequestCount,
+    new Alarm(scope, `${props.lambdaName}HighAverageErrorCount`, {
+      metric: HighAverageErrorCount,
       evaluationPeriods: 1,
       threshold: 10.0,
       comparisonOperator: ComparisonOperator.GREATER_THAN_THRESHOLD
@@ -36,4 +36,4 @@ export class ErrorCountAlarm extends Construct {
   }
 }
 
-export default ErrorCountAlarm
+export default HighAverageErrorCountAlarm
