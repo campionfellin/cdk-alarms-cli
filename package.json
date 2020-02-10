@@ -1,5 +1,5 @@
 {
-  "name": "cdk-alarms-cli",
+  "name": "@campionfellin/cdk-alarms-cli",
   "version": "0.1.0",
   "description": "This CLI will help you make alarms for your resources",
   "author": "Campion Fellin <campionfellin@gmail.com>",

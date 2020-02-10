@@ -12,13 +12,8 @@ What it will do:
 
 ## How to use
 
-Right now, it is not published on `npm` so you'll have to follow these steps:
-
 ```
-git clone https://github.com/campionfellin/cdk-alarms-cli.git && \
-cd cdk-alarms-cli && \
-npm i && npm run build && npm i -g && \
-cdk-alarms-cli
+npx cdk-alarms-cli
 ```
 
 This will prompt you with a series of questions that help you make your alarms. Good luck!
