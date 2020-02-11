@@ -1,5 +1,5 @@
 import { ReadThrottlingAlarm } from './ReadThrottlingAlarm'
-import { AccountRCUAlarm } from './AccountRCUAlarm'
+import { AccountRCUAlarm } from '@campionfellin/cdk-common-alarms'
 import { AccountWCUAlarm } from './AccountWCUAlarm'
 import { TableRCUAlarm } from './TableRCUAlarm'
 import { TableWCUAlarm } from './TableWCUAlarm'
