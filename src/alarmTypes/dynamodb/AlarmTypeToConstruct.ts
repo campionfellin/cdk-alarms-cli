@@ -1,9 +1,9 @@
-import { ReadThrottlingAlarm } from './ReadThrottlingAlarm'
+import { ReadThrottlingAlarm } from '@campionfellin/cdk-common-alarms'
 import { AccountRCUAlarm } from '@campionfellin/cdk-common-alarms'
-import { AccountWCUAlarm } from './AccountWCUAlarm'
-import { TableRCUAlarm } from './TableRCUAlarm'
-import { TableWCUAlarm } from './TableWCUAlarm'
-import { WriteThrottlingAlarm} from './WriteThrottlingAlarm'
+import { AccountWCUAlarm } from '@campionfellin/cdk-common-alarms'
+import { TableRCUAlarm } from '@campionfellin/cdk-common-alarms'
+import { TableWCUAlarm } from '@campionfellin/cdk-common-alarms'
+import { WriteThrottlingAlarm } from '@campionfellin/cdk-common-alarms'
 
 export const alarmTypeToConstruct: Record<string, any> = {
   'ReadThrottlingAlarm': ReadThrottlingAlarm,
